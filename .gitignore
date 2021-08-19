@@ -1,0 +1,33 @@
+.DS_Store
+node_modules
+dist
+test
+
+# local env files
+.env.local
+.env.*.local
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+ifengfm/.DS_Store
+ifengfm/node_modules
+ifengfm/dist
+ifengfm/test
+renbenwebsite/.DS_Store
+renbenwebsite/node_modules
+renbenwebsite/dist
+open_platform/.DS_Store
+open_platform/node_modules
+open_platform/dist
