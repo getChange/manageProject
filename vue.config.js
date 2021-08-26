@@ -49,7 +49,7 @@ module.exports = {
     compress: true, //启用Gzip
     proxy: {
       '/api': {
-        target: 'http://www.ad.wzl/index.php',
+        target: 'http://10.0.0.79:9006/index.php/',
         changeOrigin: true,
         pathRewrite: {
           '^/api': '/api'

@@ -9,26 +9,44 @@ import {
  * 获取广告列表
  * @returns 
  */
-export const adListData = (data) => get(baseUrlApi + 'api/patchvideo/list', data, {})
+export const adListData = (data) => post(baseUrlApi + 'api/advert/list', data, {})
 /**
  * 获取视频列表
  * @returns 
  */
-export const videoListData = (data) => get(baseUrlApi + 'api/patchvideo/list', data, {})
+export const videoListData = (data) => post(baseUrlApi + 'api/patchVideo/list', data, {})
 /**
  * 获取输入建议列表
  * @returns 
  */
-export const suggestListData = (data) => post(baseUrlApi + 'api/patchvideo/list', data, {})
+export const suggestListData = (data) => get('http://fm.cmpp.renbenzhihui.com/Cmpp/runtime/interface_750535.jhtml', data, {})
 /**
- * 提交编辑/新增结果
+ * 广告提交编辑/新增结果
  * @param {*} data 
  * @returns 
  */
-export const submitData = (data) => post(baseUrlApi + 'api/patchvideo/list', data, {})
+export const submitAdData = (data) => post(baseUrlApi + 'api/advert/save', data, {})
 /**
- * 删除列表内容
+ * 视频提交新增结果
  * @param {*} data 
  * @returns 
  */
-export const deleteData = (data) => post(baseUrlApi + 'api/patchvideo/list', data, {})
+ export const addVideoData = (data) => post(baseUrlApi + 'api/patchVideo/add', data, {})
+ /**
+ * 视频提交编辑结果
+ * @param {*} data 
+ * @returns 
+ */
+  export const editVideoData = (data) => post(baseUrlApi + 'api/patchVideo/edit', data, {})
+/**
+ * 广告删除列表内容
+ * @param {*} data 
+ * @returns 
+ */
+export const deleteAdData = (data) => post(baseUrlApi + 'api/advert/del', data, {})
+/**
+ * 视频删除列表内容
+ * @param {*} data 
+ * @returns 
+ */
+ export const deleteVideoData = (data) => post(baseUrlApi + 'api/patchVideo/del', data, {})
