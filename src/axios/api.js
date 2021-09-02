@@ -1,5 +1,5 @@
 let baseUrlApi = process.env.NODE_ENV === 'production' ? process.env.VUE_APP_API_URL : ''
-
+let searchApi = process.env.NODE_ENV === 'production' ? process.env.VUE_SEARCH_URL : ''
 import {
   get,
   post
@@ -19,7 +19,7 @@ export const videoListData = (data) => post(baseUrlApi + 'api/patchVideo/list', 
  * 获取输入建议列表
  * @returns 
  */
-export const suggestListData = (data) => get('http://fm.cmpp.renbenzhihui.com/Cmpp/runtime/interface_750535.jhtml', data, {})
+export const suggestListData = (data) => get(searchApi + 'Cmpp/runtime/interface_750535.jhtml', data, {})
 /**
  * 广告提交编辑/新增结果
  * @param {*} data 
@@ -31,13 +31,13 @@ export const submitAdData = (data) => post(baseUrlApi + 'api/advert/save', data,
  * @param {*} data 
  * @returns 
  */
- export const addVideoData = (data) => post(baseUrlApi + 'api/patchVideo/add', data, {})
- /**
+export const addVideoData = (data) => post(baseUrlApi + 'api/patchVideo/add', data, {})
+/**
  * 视频提交编辑结果
  * @param {*} data 
  * @returns 
  */
-  export const editVideoData = (data) => post(baseUrlApi + 'api/patchVideo/edit', data, {})
+export const editVideoData = (data) => post(baseUrlApi + 'api/patchVideo/edit', data, {})
 /**
  * 广告删除列表内容
  * @param {*} data 
@@ -49,4 +49,4 @@ export const deleteAdData = (data) => post(baseUrlApi + 'api/advert/del', data, 
  * @param {*} data 
  * @returns 
  */
- export const deleteVideoData = (data) => post(baseUrlApi + 'api/patchVideo/del', data, {})
+export const deleteVideoData = (data) => post(baseUrlApi + 'api/patchVideo/del', data, {})

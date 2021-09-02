@@ -54,6 +54,13 @@ module.exports = {
         pathRewrite: {
           '^/api': '/api'
         }
+      },
+      '/Cmpp': {
+        target: 'http://fm.cmpp.renbenzhihui.com/',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/Cmpp': '/Cmpp'
+        }
       }
     }
   },

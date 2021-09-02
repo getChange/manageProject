@@ -18,10 +18,12 @@
         <!-- 筛选条件 -->
         <div class="options-part">
           <div class="options-list">
+            <!-- 广告标题搜索 -->
             <div class="option-item" v-if="pageType === 'ad'">
               <div class="label-title">标题搜索</div>
               <el-input v-model="adTitle" placeholder="请输入内容"></el-input>
             </div>
+            <!-- 广告类型搜索 -->
             <div class="option-item" v-if="pageType === 'ad'">
               <div class="label-title">类型</div>
               <el-select
@@ -38,18 +40,15 @@
                 </el-option>
               </el-select>
             </div>
+            <!-- 视频标题搜索 -->
             <div class="option-item" v-if="pageType === 'video'">
               <div class="label-title">视频标题搜索</div>
-              <el-autocomplete
-                class="inline-input"
+              <el-input
                 v-model="videoTitleAutoComplete"
-                :fetch-suggestions="querySearch"
-                placeholder="请输入内容"
-                :trigger-on-focus="false"
-                @select="vidSelect"
-                :debounce="0"
-              ></el-autocomplete>
+                placeholder="请输入视频标题"
+              ></el-input>
             </div>
+            <!-- 视频平台搜索 -->
             <div class="option-item" v-if="pageType === 'video'">
               <div class="label-title">平台搜索</div>
               <el-select
@@ -66,6 +65,7 @@
                 </el-option>
               </el-select>
             </div>
+            <!-- 视频渠道搜索 -->
             <div class="option-item" v-if="pageType === 'video'">
               <div class="label-title">渠道搜索</div>
               <el-select
@@ -82,6 +82,7 @@
                 </el-option>
               </el-select>
             </div>
+            <!-- 视频发布日期搜索 -->
             <div class="option-item" v-if="pageType === 'video'">
               <div class="label-title">日期</div>
               <el-date-picker
@@ -143,6 +144,14 @@
         <el-table-column label="地址">
           <template slot-scope="scope">{{ scope.row.url }}</template>
         </el-table-column>
+        <!-- 播放视频按钮 -->
+        <el-table-column label="播放视频">
+          <template slot-scope="scope">
+            <div class="table-tips play-btn" @click="showVideoDialog(scope)">
+              播放<i class="el-icon-video-play"></i>
+            </div>
+          </template>
+        </el-table-column>
         <!-- 合成状态 -->
         <el-table-column label="合成状态" v-if="pageType === 'video'">
           <template slot-scope="scope">{{
@@ -199,15 +208,15 @@
         <el-dialog
           title="新增/编辑"
           :visible.sync="editDialog"
-          width="20%"
+          width="40%"
           @close="setListData"
         >
           <div class="content">
-            <!-- id -->
-            <div class="option-item" v-if="pageType === 'ad'">
+            <!-- 广告id -->
+            <!-- <div class="option-item" v-if="pageType === 'ad'">
               <div class="label-title">ID</div>
               <el-input v-model="idEdit" placeholder="请输入广告ID"></el-input>
-            </div>
+            </div> -->
             <!-- 广告类型 -->
             <div class="option-item" v-if="pageType === 'ad'">
               <div class="label-title">类型</div>
@@ -242,15 +251,30 @@
               ></el-input>
             </div>
             <!-- 广告url -->
-            <div class="option-item" v-if="pageType === 'ad'">
+            <!-- 插入文件上传组件 -->
+            <div
+              class="option-item"
+              v-if="pageType === 'ad' && buttonType === 'add'"
+            >
+              <div class="label-title">广告视频</div>
+              <video-upload
+                id="uploadVideo"
+                :browse-button="'uploadVideoButton'"
+                :limit="1"
+                accept-files=".mp4,.mp3"
+                @on-change="getVideoFile"
+                @up-loaded="getFileSuccess"
+              ></video-upload>
+            </div>
+            <!-- <div class="option-item" v-if="pageType === 'ad'">
               <div class="label-title">广告url</div>
               <el-input
                 v-model="adUrlEdit"
                 placeholder="请输入广告url"
               ></el-input>
-            </div>
+            </div> -->
             <!-- 广告id -->
-            <div
+            <!-- <div
               class="option-item"
               v-if="pageType === 'video' && buttonType === 'add'"
             >
@@ -259,9 +283,9 @@
                 v-model="adIDEdit"
                 placeholder="请输入广告ID"
               ></el-input>
-            </div>
+            </div> -->
             <!-- 视频id -->
-            <div
+            <!-- <div
               class="option-item"
               v-if="pageType === 'video' && buttonType === 'add'"
             >
@@ -270,8 +294,24 @@
                 v-model="videoIDEdit"
                 placeholder="请输入视频ID"
               ></el-input>
+            </div> -->
+            <!-- 视频新增时广告标题 -->
+            <div
+              class="option-item"
+              v-if="pageType === 'video' && buttonType === 'add'"
+            >
+              <div class="label-title">广告标题</div>
+              <el-autocomplete
+                class="inline-input"
+                v-model="adAutoCompleteEdit"
+                :fetch-suggestions="querySearchAd"
+                placeholder="请输入内容"
+                :trigger-on-focus="false"
+                @select="adSelectEdit"
+                :debounce="0"
+              ></el-autocomplete>
             </div>
-            <!-- 视频标题 -->
+            <!-- 视频新增时视频标题 -->
             <div
               class="option-item"
               v-if="pageType === 'video' && buttonType === 'add'"
@@ -280,7 +320,7 @@
               <el-autocomplete
                 class="inline-input"
                 v-model="titleAutoCompleteEdit"
-                :fetch-suggestions="querySearch"
+                :fetch-suggestions="querySearchVideo"
                 placeholder="请输入内容"
                 :trigger-on-focus="false"
                 @select="titleSelectEdit"
@@ -288,16 +328,25 @@
               ></el-autocomplete>
             </div>
             <!-- 视频url -->
-            <div
+            <!-- 插入文件上传组件 -->
+            <!-- <div
               class="option-item"
-              v-if="pageType === 'ad' && buttonType === 'add'"
+              v-if="pageType === 'video' && buttonType === 'add'"
             >
               <div class="label-title">视频url</div>
+              <video-upload
+                id="uploadVideo"
+                :browse-button="'uploadVideoButton'"
+                :limit="1"
+                accept-files=".mp4,.mp3"
+                @on-change="getVideoFile"
+                @up-loaded="getFileSuccess"
+              ></video-upload>
               <el-input
                 v-model="videoUrlEdit"
                 placeholder="请输入视频url"
               ></el-input>
-            </div>
+            </div> -->
             <!-- 视频平台选择 -->
             <div class="option-item" v-if="pageType === 'video'">
               <div class="label-title">平台</div>
@@ -350,7 +399,10 @@
               </el-select>
             </div>
             <!-- 视频状态 -->
-            <div class="option-item" v-if="pageType === 'video'">
+            <div
+              class="option-item"
+              v-if="pageType === 'video' && buttonType === 'edit'"
+            >
               <div class="label-title">状态</div>
               <el-select
                 class="input-name"
@@ -387,15 +439,39 @@
           </span>
         </el-dialog>
       </div>
+      <!-- 视频弹窗 -->
+      <div class="video-dialog">
+        <el-dialog
+          title="播放器"
+          :visible.sync="videoDialog"
+          width="50%"
+          @close="pausedVideo"
+        >
+          <video-player
+            class="video-player vjs-custom-skin"
+            ref="videoPlayer"
+            :playsinline="true"
+            :options="videoOptions"
+          >
+          </video-player>
+        </el-dialog>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import { videoPlayer } from 'vue-video-player'
+import 'video.js/dist/video-js.css'
 import format from '@/assets/js/utils'
 import _session from '@/state/sessionStorage'
 import { adListData, videoListData, suggestListData, submitAdData, addVideoData, editVideoData, deleteAdData, deleteVideoData } from '@/axios/api'
+import videoUpload from '@/components/Upload.vue'
 export default {
+  components: {
+    videoUpload,
+    videoPlayer
+  },
   data () {
     return {
       showOptions: true, // 显示与隐藏筛选条件
@@ -413,7 +489,8 @@ export default {
       }],
       valueAdType: 1, // 广告类型默认选种类型
       videoTitleAutoComplete: '', // 视频标题搜索值
-      suggestList: [], // 输入内容建议列表
+      suggestListVideo: [], // 视频输入内容建议列表
+      suggestListAd: [], // 广告输入内容建议列表
       optionsChannel: [{ // 渠道
         value: 0,
         label: '全部'
@@ -467,10 +544,10 @@ export default {
       adUrlEdit: '', // 广告编辑/新增时url值
       videoIDEdit: 0, // 视频新增时视频id
       adIDEdit: 0, // 视频新增时广告id
-      videoIDAdd: 0, // 视频新增时视频ID
+      // videoIDAdd: 0, // 视频新增时视频ID
       videoUrlEdit: '', // 视频新增时视频url
-      titleAutoCompleteEdit: '', // 编辑时视频标题
-      // adAutoCompleteEdit: '', // 编辑时广告表题
+      titleAutoCompleteEdit: '', // 视频新增时视频标题
+      adAutoCompleteEdit: '', // 视频新增时广告表题
       valuePlatformEdit: 0, // 编辑时平台选中值
       valueChannelEdit: 0, // 编辑时渠道选中值
       valueDateEdit: '', // 编辑时上线时间值
@@ -493,6 +570,10 @@ export default {
         label: '下线'
       }],
       valueStatusEdit: 1, // 编辑时状态选中值
+      videoFile: '',
+      videoFileSuccess: '',
+      videoDialog: false, // 视频播放器弹窗
+      videoOptions: {},
     }
   },
   props: {
@@ -537,11 +618,7 @@ export default {
           {
             let data = {
               title: this.adTitle,
-              id: this.videoTitleAutoComplete,
-              platform: this.valuePlatform,
-              channel: this.valueChannel,
-              startTime: this.valueDate[0] || '',
-              endTime: this.valueDate[1] || '',
+              type: this.valueAdType,
               page: this.pageNum,
               pageNum: this.pageSize
             }
@@ -592,10 +669,8 @@ export default {
         case 'video':
           {
             let data = {
-              title: this.adTitle,
-              id: this.videoTitleAutoComplete,
+              title: this.videoTitleAutoComplete,
               platform: this.valuePlatform,
-              channel: this.valueChannel,
               startTime: this.valueDate[0] || '',
               endTime: this.valueDate[1] || '',
               page: this.pageNum,
@@ -684,30 +759,70 @@ export default {
           break
       }
     },
-    // 根据输入内容提供建议
-    querySearch (queryString, cb) {
-      var suggestList = [];
+    // 根据视频标题输入内容提供建议
+    querySearchVideo (queryString, cb) {
+      let suggestList = [];
       // 需要修改接口返回的内容
-      suggestListData().then(res => {
-        if (res.result.length !== 0) {
-          this.suggestList = res.result
-          if (this.suggestList.length === 0) {
+      let data = {
+        search: queryString,
+        page: 1
+      }
+      let that = this
+      suggestListData(data).then(res => {
+        that.suggestListVideo = res.result
+        console.log(this.suggestListVideo)
+        if (that.suggestListVideo.length === 0) {
+          suggestList.push({
+            value: '没有找到！'
+          })
+          console.log(suggestList)
+        } else {
+          for (let i = 0; i < res.result.length; i++) {
+            //转换成id和value属性的对象数组
             suggestList.push({
-              value: '没有找到！'
+              id: res.result[i].id,
+              value: res.result[i].text,
+              url: res.result[i].url
             })
-          } else {
-            for (let i = 0; i < res.result.length; i++) {
-              //转换成id和value属性的对象数组
-              suggestList.push({
-                id: res.result[i].id,
-                value: res.data[i].text
-              })
-            }
           }
-          var results = queryString ? suggestList.filter(this.createFilter(queryString)) : suggestList;
-          // 调用 callback 返回建议列表的数据
-          cb(results);
+          console.log(this.suggestListVideo)
         }
+        // var results = queryString ? suggestList.filter(this.createFilter(queryString)) : suggestList;
+        // 调用 callback 返回建议列表的数据
+        cb(suggestList);
+      })
+    },
+    // 根据广告标题输入内容提供建议
+    querySearchAd (queryString, cb) {
+      let suggestList = [];
+      // 需要修改接口返回的内容
+      let data = {
+        search: queryString,
+        page: 1
+      }
+      let that = this
+      suggestListData(data).then(res => {
+        that.suggestListAd = res.result
+        console.log(this.suggestListAd)
+        if (that.suggestListAd.length === 0) {
+          suggestList.push({
+            value: '没有找到！'
+          })
+          console.log(suggestList)
+        } else {
+          for (let i = 0; i < res.result.length; i++) {
+            //转换成id和value属性的对象数组
+            suggestList.push({
+              id: res.result[i].id,
+              value: res.result[i].text,
+              url: res.result[i].url
+            })
+          }
+          console.log(this.suggestListAd)
+        }
+        // var results = queryString ? suggestList.filter(this.createFilter(queryString)) : suggestList;
+        // 调用 callback 返回建议列表的数据
+        cb(suggestList);
       })
     },
     // 筛选返回的结果
@@ -716,14 +831,8 @@ export default {
         return (restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
       };
     },
-    // 选中建议中的id
-    vidSelect (val) {
-      console.log(val)
-      this.getDataList()
-    },
     // 搜索按钮
     search () {
-      console.log(this.valueDate)
       this.getDataList()
     },
     // 新增按钮
@@ -744,12 +853,14 @@ export default {
         this.adDescEdit = item.discription
         this.adUrlEdit = item.url
       } else {
-        this.videoIDAdd = item.id
-        this.titleAutoCompleteEdit = item.title
+        this.videoIDEdit = item.id
         this.valuePlatformEdit = item.platform
         this.valueChannelEdit = item.channel
         this.valueInsertEdit = item.location
         this.valueStatusEdit = item.status
+        this.valueDateEdit = []
+        this.valueDateEdit[0] = item.ctime * 1000
+        this.valueDateEdit[1] = item.etime * 1000
       }
     },
     // 删除按钮
@@ -790,14 +901,18 @@ export default {
         this.adTitleEdit = ''
         this.adDescEdit = ''
         this.adUrlEdit = ''
+        this.videoFile = ''
+        this.videoFileSuccess = ''
       } else {
         this.adIDEdit = 0
-        this.videoIDAdd = 0
+        this.videoIDEdit = 0
+        this.adAutoCompleteEdit = ''
         this.titleAutoCompleteEdit = ''
         this.valuePlatformEdit = 0
         this.valueChannelEdit = 0
         this.valueInsertEdit = 1
         this.valueStatusEdit = 1
+        this.valueDateEdit = []
       }
     },
     // 编辑/新增弹窗取消按钮
@@ -816,8 +931,13 @@ export default {
               id: this.idEdit,
               type: this.valueAdTypeEdit,
               title: this.adTitleEdit,
-              discription: this.adDescEdit,
-              url: this.adUrlEdit
+              discription: this.adDescEdit
+            }
+            if (this.buttonType === 'add') {
+              data.file_id = this.videoFileSuccess[0].file_id
+              data.file_type = this.videoFileSuccess[0].file_type
+            } else {
+              data.url = this.adUrlEdit
             }
             console.log(data)
             submitAdData(data).then(res => {
@@ -836,7 +956,7 @@ export default {
               let data = {
                 advertId: this.adIDEdit,
                 videoId: this.videoIDEdit,
-                title: this.videoTitleAutoComplete,
+                title: this.titleAutoCompleteEdit,
                 url: this.videoUrlEdit,
                 platform: this.valuePlatformEdit,
                 channel: this.valueChannelEdit,
@@ -896,11 +1016,53 @@ export default {
     },
     titleSelectEdit (val) {
       console.log(val)
-      this.getDataList()
+      this.titleAutoCompleteEdit = val.value
+      this.videoUrlEdit = val.url
+      this.videoIDEdit = val.id
     },
     adSelectEdit (val) {
       console.log(val)
-    }
+      this.adIDEdit = val.id
+      this.adAutoCompleteEdit = val.value
+    },
+    getVideoFile (data) {
+      console.log(data)
+      this.videoFile = data
+    },
+    getFileSuccess (data) {
+      console.log(data)
+      this.videoFileSuccess = data
+    },
+    // 视频播放器弹窗显示
+    showVideoDialog (scope) {
+      console.log(scope)
+      this.videoDialog = true
+      this.videoOptions = {
+        playbackRates: [0.5, 1.0, 1.5, 2.0], // 可选的播放速度
+        autoplay: false, // 如果为true,浏览器准备好时开始回放。
+        muted: false, // 默认情况下将会消除任何音频。
+        loop: false, // 是否视频一结束就重新开始。
+        preload: 'auto', // 建议浏览器在<video>加载元素后是否应该开始下载视频数据。auto浏览器选择最佳行为,立即开始加载视频（如果浏览器支持）
+        language: 'zh-CN',
+        aspectRatio: '16:9', // 将播放器置于流畅模式，并在计算播放器的动态大小时使用该值。值应该代表一个比例 - 用冒号分隔的两个数字（例如"16:9"或"4:3"）
+        fluid: true, // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
+        sources: [{
+          type: "video/mp4", // 类型
+          src: scope.row.url // url地址
+        }],
+        poster: '', // 封面地址
+        notSupportedMessage: '此视频暂无法播放，请稍后再试', // 允许覆盖Video.js无法播放媒体源时显示的默认信息。
+        controlBar: {
+          timeDivider: true, // 当前时间和持续时间的分隔符
+          durationDisplay: true, // 显示持续时间
+          remainingTimeDisplay: false, // 是否显示剩余时间功能
+          fullscreenToggle: true // 是否显示全屏按钮
+        }
+      }
+    },
+    pausedVideo () {
+      this.$refs.videoPlayer.player.pause() // 暂停
+    },
   }
 }
 </script>
@@ -979,6 +1141,9 @@ export default {
           margin-right: 10px;
           font-size: 12px;
         }
+        .el-autocomplete {
+          width: 100% !important;
+        }
         .input-name {
           width: 60% !important;
         }
@@ -1003,5 +1168,12 @@ export default {
 
 .sub-page /deep/ .el-table td {
   padding: 0;
+}
+
+.sub-page /deep/ .video-js .vjs-big-play-button {
+  top: 50%;
+  left: 50%;
+  margin-left: -1.5em;
+  margin-top: -0.75em;
 }
 </style>
